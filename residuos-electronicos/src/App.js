@@ -5,7 +5,7 @@ import Ubicaciones from './components/Ubicaciones';
 import PuntosRecoleccion from './components/PuntosRecoleccion';
 import Home from './components/Home';
 import Eventos from './components/Eventos';
-import Dispositivos from './components/Dispositivos';
+import Reciclaje from './components/Reciclaje';
 import './App.css'; // Importamos los estilos
 
 function App() {
@@ -19,7 +19,7 @@ function App() {
           <NavLink to="/ubicaciones" className="nav-link">Ubicaciones</NavLink>
           <NavLink to="/puntos-recoleccion" className="nav-link">Puntos de Recolección</NavLink>
           <NavLink to="/eventos" className="nav-link">Eventos</NavLink>
-          <NavLink to="/dispositivos" className="nav-link">Dispositivos</NavLink>
+          <NavLink to="/reciclaje" className="nav-link">Reciclaje</NavLink>
         </nav>
 
         {/* 🔹 Rutas de la aplicación */}
@@ -29,7 +29,7 @@ function App() {
           <Route path="/ubicaciones" element={<Ubicaciones />} />
           <Route path="/puntos-recoleccion" element={<PuntosRecoleccion />} />
           <Route path="/eventos" element={<Eventos />} />
-          <Route path="/dispositivos" element={<Dispositivos />} />
+          <Route path="/reciclaje" element={<Reciclaje />} />
         </Routes>
       </div>
     </Router>

@@ -2,18 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import axios from 'axios';
 import "./Dispositivos.css"
-const Dispositivos = () => {
-const [dispositivos, setDispositivos] = useState([]);
+const Reciclaje = () => {
+const [reciclajes, setReciclajes] = useState([]);
 const [open, setOpen] = useState(false);
-const [nuevoDispositivo, setNuevoDispositivo] = useState({ tipo: '', marca: '', modelo: '', estado: '', usuario_id: '' });
+const [nuevoReciclaje, setNuevoReciclaje] = useState({ tipo: '', marca: '', modelo: '', estado: '', usuario_id: '' });
 // 🔹 Obtener dispositivos al cargar el componente
 useEffect(() => {
-fetchDispositivos();
+fetchReciclables();
 }, []);
-const fetchDispositivos = async () => {
+const fetchReciclables = async () => {
 try {
 const response = await axios.get('http://localhost:5000/api/dispositivos ');
-setDispositivos(response.data);
+setReciclajes(response.data);
 console.log("📡 Dispositivos obtenidos:", response.data);
 } catch (error) {
 console.error("❌ Error al obtener dispositivos:", error);
@@ -22,10 +22,10 @@ console.error("❌ Error al obtener dispositivos:", error);
 const handleOpen = () => setOpen(true);
 const handleClose = () => {
 setOpen(false);
-setNuevoDispositivo({ tipo: '', marca: '', modelo: '', estado: '', usuario_id: '' }); // Limpiar formulario al cerrar
+setNuevoReciclaje({ tipo: '', marca: '', modelo: '', estado: '', usuario_id: '' }); // Limpiar formulario al cerrar
 };
 const handleChange = (e) => {
-setNuevoDispositivo(prev => {
+setNuevoReciclaje(prev => {
 const newState = { ...prev, [e.target.name]: e.target.value };
 console.log("✍ Actualizando campo:", e.target.name, "➡", e.target.value);
 return newState;
@@ -34,18 +34,18 @@ return newState;
 // 🔹 Agregar un nuevo dispositivo
 const handleSubmit = async () => {
 try {
-console.log("📤 Enviando datos:", nuevoDispositivo);
+console.log("📤 Enviando datos:", nuevoReciclaje);
 // Validación antes de enviar
-if (!nuevoDispositivo.tipo || !nuevoDispositivo.marca || !nuevoDispositivo.modelo || !nuevoDispositivo.estado || !nuevoDispositivo.usuario_id) {
+if (!nuevoReciclaje.tipo || !nuevoReciclaje.marca || !nuevoReciclaje.modelo || !nuevoReciclaje.estado || !nuevoReciclaje.usuario_id) {
 console.error("❌ Todos los campos son obligatorios.");
 alert("Todos los campos son obligatorios.");
 return;
 }
-const response = await axios.post('http://localhost:5000/api/dispositivos/agregar ', nuevoDispositivo);
+const response = await axios.post('http://localhost:5000/api/dispositivos/agregar ', nuevoReciclaje);
 
 console.log("✅ Dispositivo agregado:", response.data);
 
-fetchDispositivos(); // Recargar la lista después de agregar un dispositivo
+fetchReciclables(); // Recargar la lista después de agregar un dispositivo
 handleClose();
 } catch (error) {
 console.error("❌ Error al agregar dispositivo:", error);
@@ -53,23 +53,23 @@ console.error("❌ Error al agregar dispositivo:", error);
 };
 return (
 <div>
-<h2>Dispositivos</h2>
+<h2>Reciclajes</h2>
 <div className="button-container">
-<Button variant="contained" onClick={handleOpen} sx={{ mb: 2 }}>Agregar Dispositivo</Button>
+<Button variant="contained" onClick={handleOpen} sx={{ mb: 2 }}>Agregar Reciclaje</Button>
 </div>
 <TableContainer component={Paper}>
 <Table>
 <TableHead>
 <TableRow>
 <TableCell>Tipo</TableCell>
-<TableCell>Marca</TableCell>
-<TableCell>Modelo</TableCell>
+<TableCell>Descripción</TableCell>
+<TableCell>Cantidad</TableCell>
 <TableCell>Estado</TableCell>
 <TableCell>ID de Usuario</TableCell>
 </TableRow>
 </TableHead>
 <TableBody>
-{dispositivos.map((dispositivo) => (
+{reciclajes.map((dispositivo) => (
 <TableRow key={dispositivo.id}>
 <TableCell>{dispositivo.tipo}</TableCell>
 <TableCell>{dispositivo.marca}</TableCell>
@@ -85,11 +85,11 @@ return (
 <Dialog open={open} onClose={handleClose}>
 <DialogTitle>Agregar Dispositivo</DialogTitle>
 <DialogContent>
-<TextField label="Tipo" name="tipo" fullWidth margin="normal" onChange={handleChange} value={nuevoDispositivo.tipo} />
-<TextField label="Marca" name="marca" fullWidth margin="normal" onChange={handleChange} value={nuevoDispositivo.marca} />
-<TextField label="Modelo" name="modelo" fullWidth margin="normal" onChange={handleChange} value={nuevoDispositivo.modelo} />
-<TextField label="Estado" name="estado" fullWidth margin="normal" onChange={handleChange} value={nuevoDispositivo.estado} />
-<TextField label="ID de Usuario" name="usuario_id" fullWidth margin="normal" onChange={handleChange} value={nuevoDispositivo.usuario_id} />
+<TextField label="Tipo" name="tipo" fullWidth margin="normal" onChange={handleChange} value={nuevoReciclaje.tipo} />
+<TextField label="Descripción" name="marca" fullWidth margin="normal" onChange={handleChange} value={nuevoReciclaje.marca} />
+<TextField label="Cantidad" name="modelo" fullWidth margin="normal" onChange={handleChange} value={nuevoReciclaje.modelo} />
+<TextField label="Estado" name="estado" fullWidth margin="normal" onChange={handleChange} value={nuevoReciclaje.estado} />
+<TextField label="ID de Usuario" name="usuario_id" fullWidth margin="normal" onChange={handleChange} value={nuevoReciclaje.usuario_id} />
 </DialogContent>
 <DialogActions>
 <Button onClick={handleClose}>Cancelar</Button>
@@ -99,4 +99,4 @@ return (
 </div>
 );
 };
-export default Dispositivos;
+export default Reciclaje;
