@@ -3,22 +3,25 @@
   display: flex;
   justify-content: center;
   gap: 20px;
-  background-color: #f8f9fa;
+  background-color: #343a40; /* Nuevo color (gris oscuro) */
   padding: 10px;
   border-bottom: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra para la barra de navegación */
 }
 
 .nav-link {
   text-decoration: none;
-  color: #333;
+  color: #fff; /* Cambiar el color del texto a blanco para mejor contraste */
   font-weight: bold;
-  padding: 10px;
+  padding: 10px 15px; /* Aumentar el padding para un mejor clic */
   border-radius: 5px;
+  transition: background-color 0.3s, color 0.3s, transform 0.3s; /* Transiciones suaves */
 }
 
 .nav-link:hover {
   background-color: #007bff;
   color: white;
+  transform: scale(1.1); /* Efecto de zoom */
 }
 
 /* Estilo para los componentes (cuadros) */
@@ -27,6 +30,7 @@
   flex-wrap: wrap;
   justify-content: space-around;
   gap: 20px;
+  padding: 20px; /* Añadir padding a la contenedor */
 }
 
 .card {
@@ -39,6 +43,11 @@
   background-color: #fff;
   text-align: center;
   flex-basis: calc(33% - 40px); /* Tres columnas */
+  transition: transform 0.3s; /* Transición suave al hacer hover */
+}
+
+.card:hover {
+  transform: translateY(-5px); /* Efecto de elevación al pasar el mouse */
 }
 
 .card h2 {
@@ -60,4 +69,9 @@
   color: white;
   text-decoration: none;
   border-radius: 5px;
+  transition: background-color 0.3s; /* Transición suave */
+}
+
+.boton:hover {
+  background-color: darkblue; /* Cambio de color al pasar el mouse */
 }
