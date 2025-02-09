@@ -12,6 +12,17 @@ const agregarPuntoRecoleccion = async (nombre, direccion, latitud, longitud) => 
   }
 };
 
+// Nueva función para obtener las direcciones de puntos de recolección
+const obtenerDirecciones = async () => {
+  try {
+    const result = await pool.query('SELECT id, direccion FROM PuntosRecoleccion');
+    return result.rows;
+  } catch (err) {
+    throw new Error('Error al obtener direcciones: ' + err.message);
+  }
+};
+
 module.exports = {
   agregarPuntoRecoleccion,
+  obtenerDirecciones, // Se exporta la nueva función
 };

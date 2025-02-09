@@ -14,27 +14,32 @@ import {
   DialogContent,
   DialogActions,
   Alert,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
 } from '@mui/material';
 import axios from 'axios';
 import "./Eventos.css";
 
 const Eventos = () => {
   const [eventos, setEventos] = useState([]);
+  const [ubicaciones, setUbicaciones] = useState([]);
   const [open, setOpen] = useState(false);
-  const [editMode, setEditMode] = useState(false); // Para manejar el modo edición
-  const [eventoSeleccionado, setEventoSeleccionado] = useState(null); // Para almacenar el evento seleccionado
+  const [editMode, setEditMode] = useState(false);
+  const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
   const [nuevoEvento, setNuevoEvento] = useState({
     nombre: '',
     fecha: '',
     descripcion: '',
-    ubicacion_id: '',
+    ubicacion: '',  // 🔹 Ahora todo se maneja con 'ubicacion'
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Fetch eventos al cargar el componente
   useEffect(() => {
     fetchEventos();
+    fetchUbicaciones();
   }, []);
 
   const fetchEventos = async () => {
@@ -42,20 +47,30 @@ const Eventos = () => {
       const response = await axios.get('http://localhost:5000/api/eventos');
       setEventos(response.data);
     } catch (error) {
-      console.error("❌ Error al obtener eventos:", error);
+      console.error("Error al obtener eventos:", error);
       setError('Error al cargar los eventos. Inténtalo de nuevo.');
     }
   };
 
+  const fetchUbicaciones = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/puntos-recoleccion/direcciones');
+      setUbicaciones(response.data);
+    } catch (error) {
+      console.error("Error al obtener ubicaciones:", error);
+      setError('Error al cargar las ubicaciones. Inténtalo de nuevo.');
+    }
+  };
+
   const handleOpen = () => {
-    setEditMode(false); // Modo agregar
-    setNuevoEvento({ nombre: '', fecha: '', descripcion: '', ubicacion_id: '' }); // Limpiar formulario
+    setEditMode(false);
+    setNuevoEvento({ nombre: '', fecha: '', descripcion: '', ubicacion: '' });
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
-    setError(''); // Limpiar mensajes de error al cerrar el diálogo
+    setError('');
   };
 
   const handleChange = (e) => {
@@ -65,72 +80,50 @@ const Eventos = () => {
 
   const handleSubmit = async () => {
     try {
-      // Validar que todos los campos estén completos
-      if (!nuevoEvento.nombre || !nuevoEvento.fecha || !nuevoEvento.descripcion || !nuevoEvento.ubicacion_id) {
+      if (!nuevoEvento.nombre || !nuevoEvento.fecha || !nuevoEvento.descripcion || !nuevoEvento.ubicacion) {
         setError('Todos los campos son obligatorios.');
         return;
       }
 
-      // Validar que la fecha tenga un formato válido
       const fechaValida = Date.parse(nuevoEvento.fecha);
       if (isNaN(fechaValida)) {
         setError('La fecha ingresada no es válida.');
         return;
       }
 
-      // Validar que el ID de ubicación sea un número entero
-      const ubicacionId = parseInt(nuevoEvento.ubicacion_id, 10);
-      if (isNaN(ubicacionId) || ubicacionId <= 0) {
-        setError('El ID de ubicación debe ser un número entero positivo.');
-        return;
-      }
+      setLoading(true);
 
-      setLoading(true); // Activar indicador de carga
+      const eventoData = {
+        nombre: nuevoEvento.nombre.trim(),
+        fecha: nuevoEvento.fecha,
+        descripcion: nuevoEvento.descripcion.trim(),
+        ubicacion: nuevoEvento.ubicacion,  // 🔹 Ahora se guarda como 'ubicacion'
+      };
+
+      console.log("📤 Enviando evento:", eventoData);
 
       if (editMode) {
-        // Modo edición: Actualizar evento existente
-        await axios.put(`http://localhost:5000/api/eventos/${eventoSeleccionado.id}`, {
-          ...nuevoEvento,
-          fecha: nuevoEvento.fecha,
-          ubicacion_id: ubicacionId,
-        });
+        await axios.put(`http://localhost:5000/api/eventos/${eventoSeleccionado.id}`, eventoData);
       } else {
-        // Modo agregar: Crear nuevo evento
-        await axios.post('http://localhost:5000/api/eventos', {
-          ...nuevoEvento,
-          fecha: nuevoEvento.fecha,
-          ubicacion_id: ubicacionId,
-        });
+        await axios.post('http://localhost:5000/api/eventos/agregar', eventoData);
       }
 
-      fetchEventos(); // Refrescar la lista de eventos
-      handleClose(); // Cerrar el diálogo
+      fetchEventos();
+      handleClose();
     } catch (error) {
-      console.error("❌ Error al procesar evento:", error);
+      console.error("Error al procesar evento:", error.response?.data || error);
       setError('Error al guardar el evento. Inténtalo de nuevo.');
     } finally {
-      setLoading(false); // Desactivar indicador de carga
+      setLoading(false);
     }
-  };
-
-  const handleEdit = (evento) => {
-    setEditMode(true); // Activar modo edición
-    setEventoSeleccionado(evento); // Almacenar el evento seleccionado
-    setNuevoEvento({
-      nombre: evento.nombre,
-      fecha: evento.fecha,
-      descripcion: evento.descripcion,
-      ubicacion_id: evento.ubicacion_id.toString(),
-    });
-    setOpen(true); // Abrir el diálogo
   };
 
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/api/eventos/${id}`);
-      fetchEventos(); // Refrescar la lista de eventos
+      fetchEventos();
     } catch (error) {
-      console.error("❌ Error al eliminar evento:", error);
+      console.error("Error al eliminar evento:", error);
       setError('Error al eliminar el evento. Inténtalo de nuevo.');
     }
   };
@@ -139,17 +132,14 @@ const Eventos = () => {
     <div>
       <h2>Eventos</h2>
 
-      {/* Mensajes de error */}
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-      {/* Botón para abrir el diálogo */}
-      <div className="button-container">
+      <div className="button-container" style={{ textAlign: "center" }}> {/* 🔹 Se asegura que el botón esté centrado */}
         <Button variant="contained" onClick={handleOpen} sx={{ mb: 2 }}>
           Agregar Evento
         </Button>
       </div>
 
-      {/* Tabla de eventos */}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -157,88 +147,48 @@ const Eventos = () => {
               <TableCell>Nombre</TableCell>
               <TableCell>Fecha</TableCell>
               <TableCell>Descripción</TableCell>
-              <TableCell>ID de Ubicación</TableCell>
+              <TableCell>Ubicación</TableCell>
               <TableCell>Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {eventos.length > 0 ? (
-              eventos.map((evento) => (
-                <TableRow key={evento.id}>
-                  <TableCell>{evento.nombre}</TableCell>
-                  <TableCell>{evento.fecha}</TableCell>
-                  <TableCell>{evento.descripcion}</TableCell>
-                  <TableCell>{evento.ubicacion_id}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      size="small"
-                      onClick={() => handleEdit(evento)}
-                      sx={{ mr: 1 }}
-                    >
-                      Editar
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      size="small"
-                      onClick={() => handleDelete(evento.id)}
-                    >
-                      Eliminar
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={5} align="center">
-                  No hay eventos disponibles.
+            {eventos.map((evento) => (
+              <TableRow key={evento.id}>
+                <TableCell>{evento.nombre}</TableCell>
+                <TableCell>{evento.fecha}</TableCell>
+                <TableCell>{evento.descripcion}</TableCell>
+                <TableCell>{evento.ubicacion}</TableCell> {/* 🔹 Ahora se muestra 'ubicacion' */}
+                <TableCell>
+                  <Button variant="outlined" color="primary" size="small" onClick={() => handleOpen(evento)}>
+                    Editar
+                  </Button>
+                  <Button variant="outlined" color="error" size="small" onClick={() => handleDelete(evento.id)}>
+                    Eliminar
+                  </Button>
                 </TableCell>
               </TableRow>
-            )}
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
 
-      {/* Diálogo para agregar/editar evento */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{editMode ? 'Editar Evento' : 'Agregar Evento'}</DialogTitle>
         <DialogContent>
-          <TextField
-            label="Nombre"
-            name="nombre"
-            fullWidth
-            margin="normal"
-            onChange={handleChange}
-            value={nuevoEvento.nombre}
-          />
-          <TextField
-            label="Fecha"
-            name="fecha"
-            type="date"
-            fullWidth
-            margin="normal"
-            InputLabelProps={{ shrink: true }}
-            onChange={handleChange}
-            value={nuevoEvento.fecha}
-          />
-          <TextField
-            label="Descripción"
-            name="descripcion"
-            fullWidth
-            margin="normal"
-            onChange={handleChange}
-            value={nuevoEvento.descripcion}
-          />
-          <TextField
-            label="ID de Ubicación"
-            name="ubicacion_id"
-            fullWidth
-            margin="normal"
-            onChange={handleChange}
-            value={nuevoEvento.ubicacion_id}
-          />
+          <TextField label="Nombre" name="nombre" fullWidth margin="normal" onChange={handleChange} value={nuevoEvento.nombre} />
+          <TextField label="Fecha" name="fecha" type="date" fullWidth margin="normal" InputLabelProps={{ shrink: true }} onChange={handleChange} value={nuevoEvento.fecha} />
+          <TextField label="Descripción" name="descripcion" fullWidth margin="normal" onChange={handleChange} value={nuevoEvento.descripcion} />
+
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Ubicación</InputLabel>
+            <Select name="ubicacion" value={nuevoEvento.ubicacion} onChange={handleChange}>
+              {ubicaciones.map((ubicacion) => (
+                <MenuItem key={ubicacion.id} value={ubicacion.direccion}>
+                  {ubicacion.direccion}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancelar</Button>

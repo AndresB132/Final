@@ -1,61 +1,35 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions, CircularProgress } from '@mui/material';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import { Icon } from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions } from '@mui/material';
 import "./PuntoRecoleccion.css";
+
+// Icono personalizado para los puntos
+const markerIcon = new Icon({
+  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41]
+});
 
 const PuntosRecoleccion = () => {
   const [puntos, setPuntos] = useState([]);
   const [open, setOpen] = useState(false);
   const [nuevoPunto, setNuevoPunto] = useState({ nombre: '', direccion: '', latitud: '', longitud: '' });
-  const [map, setMap] = useState(null); // Referencia al mapa
-  const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false); // Verificar si Google Maps está cargado
-
-  const initMap = useCallback(() => {
-    const defaultCenter = { lat: -0.225219, lng: -78.524883 }; // Coordenadas de Quito
-    const mapInstance = new window.google.maps.Map(document.getElementById('map'), {
-      center: defaultCenter,
-      zoom: 13,
-    });
-    setMap(mapInstance);
-    setGoogleMapsLoaded(true);
-
-    // Agregar marcadores existentes
-    puntos.forEach((punto) => {
-      new window.google.maps.Marker({
-        position: { lat: parseFloat(punto.latitud), lng: parseFloat(punto.longitud) },
-        map: mapInstance,
-        title: punto.nombre,
-      });
-    });
-  }, [puntos]);
 
   const fetchPuntos = useCallback(async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/puntos-recoleccion');
       setPuntos(response.data);
     } catch (error) {
-      console.error("❌ Error al obtener puntos de recolección:", error);
+      console.error("Error al obtener puntos de recolección:", error);
     }
   }, []);
 
-  // Cargar la API de Google Maps
-  const loadGoogleMapsScript = useCallback(() => {
-    if (!window.google) {
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyA4huEpFPbN_6OKACwg-ShzETIXaUKUSeg&callback=initMap`;
-      script.async = true;
-      script.defer = true;
-      window.initMap = initMap; // Función para inicializar el mapa
-      document.head.appendChild(script);
-    } else {
-      initMap(); // Inicializar el mapa si ya está cargado
-    }
-  }, [initMap]);
-
   useEffect(() => {
     fetchPuntos();
-    loadGoogleMapsScript();
-  }, [fetchPuntos, loadGoogleMapsScript]); // Incluidas las dependencias 'fetchPuntos' y 'loadGoogleMapsScript'
+  }, [fetchPuntos]);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -64,42 +38,61 @@ const PuntosRecoleccion = () => {
     setNuevoPunto({ ...nuevoPunto, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async () => {
+  // Función para obtener la dirección a partir de latitud y longitud
+  const obtenerDireccion = async (lat, lon) => {
     try {
-      // Validar que todos los campos estén completos
-      if (!nuevoPunto.nombre || !nuevoPunto.direccion || !nuevoPunto.latitud || !nuevoPunto.longitud) {
-        alert("Por favor, completa todos los campos.");
-        return;
-      }
-
-      // Validar que las coordenadas sean números válidos
-      const latitud = parseFloat(nuevoPunto.latitud);
-      const longitud = parseFloat(nuevoPunto.longitud);
-      if (isNaN(latitud) || isNaN(longitud)) {
-        alert("Las coordenadas deben ser números válidos.");
-        return;
-      }
-
-      // Enviar datos al backend
-      await axios.post('http://localhost:5000/api/puntos-recoleccion/agregar', {
-        nombre: nuevoPunto.nombre,
-        direccion: nuevoPunto.direccion,
-        latitud: latitud,
-        longitud: longitud
-      });
-      fetchPuntos(); // Refrescar la lista de puntos
-      handleClose(); // Cerrar el diálogo
-
-      // Agregar el nuevo marcador al mapa
-      if (map) {
-        new window.google.maps.Marker({
-          position: { lat: latitud, lng: longitud },
-          map: map,
-          title: nuevoPunto.nombre,
-        });
+      const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+      if (response.data && response.data.display_name) {
+        return response.data.display_name;
+      } else {
+        return "Dirección desconocida";
       }
     } catch (error) {
-      console.error("❌ Error al agregar punto de recolección:", error);
+      console.error("Error al obtener la dirección:", error);
+      return "Dirección no disponible";
+    }
+  };
+
+  // Componente para manejar clics en el mapa y actualizar los campos automáticamente
+  const LocationMarker = () => {
+    useMapEvents({
+      click: async (e) => {
+        const direccion = await obtenerDireccion(e.latlng.lat, e.latlng.lng);
+        setNuevoPunto({
+          ...nuevoPunto,
+          direccion: direccion,
+          latitud: e.latlng.lat,
+          longitud: e.latlng.lng
+        });
+      },
+    });
+
+    return nuevoPunto.latitud && nuevoPunto.longitud ? (
+      <Marker position={[nuevoPunto.latitud, nuevoPunto.longitud]} icon={markerIcon}>
+        <Popup>Ubicación seleccionada</Popup>
+      </Marker>
+    ) : null;
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (!nuevoPunto.nombre || !nuevoPunto.latitud || !nuevoPunto.longitud) {
+        alert("Por favor, ingresa un nombre y selecciona una ubicación en el mapa.");
+        return;
+      }
+
+      const response = await axios.post('http://localhost:5000/api/puntos-recoleccion/agregar', {
+        nombre: nuevoPunto.nombre,
+        direccion: nuevoPunto.direccion,
+        latitud: nuevoPunto.latitud,
+        longitud: nuevoPunto.longitud
+      });
+
+      console.log("Punto guardado correctamente:", response.data);
+      fetchPuntos();
+      handleClose();
+    } catch (error) {
+      console.error("Error al agregar punto de recolección:", error.response ? error.response.data : error.message);
     }
   };
 
@@ -107,7 +100,6 @@ const PuntosRecoleccion = () => {
     <div>
       <h2>Puntos de Recolección</h2>
 
-      {/* Botón para abrir el diálogo */}
       <div className="agregar-punto-container">
         <Button
           className="agregar-punto-button"
@@ -119,24 +111,32 @@ const PuntosRecoleccion = () => {
         </Button>
       </div>
 
-      {/* Mostrar indicador de carga mientras se carga Google Maps */}
-      {!googleMapsLoaded ? (
-        <div style={{ textAlign: 'center', marginTop: '50px' }}>
-          <CircularProgress />
-          <p>Cargando mapa...</p>
-        </div>
-      ) : (
-        <div id="map" style={{ height: '500px', width: '100%' }}></div>
-      )}
+      <MapContainer center={[-0.225219, -78.524883]} zoom={13} style={{ height: '500px', width: '100%' }}>
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        {puntos.map((punto, index) => (
+          <Marker key={index} position={[punto.latitud, punto.longitud]} icon={markerIcon}>
+            <Popup>{punto.nombre}<br />{punto.direccion}</Popup>
+          </Marker>
+        ))}
+        <LocationMarker />
+      </MapContainer>
 
-      {/* Diálogo para agregar punto de recolección */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Agregar Punto de Recolección</DialogTitle>
         <DialogContent>
-          <TextField label="Nombre" name="nombre" fullWidth margin="normal" onChange={handleChange} />
-          <TextField label="Dirección" name="direccion" fullWidth margin="normal" onChange={handleChange} />
-          <TextField label="Latitud" name="latitud" fullWidth margin="normal" onChange={handleChange} />
-          <TextField label="Longitud" name="longitud" fullWidth margin="normal" onChange={handleChange} />
+          <TextField 
+            label="Nombre" 
+            name="nombre" 
+            fullWidth 
+            margin="normal" 
+            value={nuevoPunto.nombre} 
+            onChange={handleChange} 
+          />
+          <TextField label="Dirección" name="direccion" fullWidth margin="normal" value={nuevoPunto.direccion} disabled />
+          <TextField label="Latitud" name="latitud" fullWidth margin="normal" value={nuevoPunto.latitud || ''} disabled />
+          <TextField label="Longitud" name="longitud" fullWidth margin="normal" value={nuevoPunto.longitud || ''} disabled />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancelar</Button>
