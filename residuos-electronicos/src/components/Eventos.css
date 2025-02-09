@@ -1,11 +1,76 @@
 /* Eventos.css */
 
+/* Importar Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
 /* Estilo para el encabezado */
 h2 {
   font-family: 'Roboto', sans-serif;
   color: #333;
   text-align: center;
   margin-bottom: 20px;
+}
+
+/* Estilo para el contenedor de eventos */
+.event-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin: 20px auto;
+  max-width: 90%;
+}
+
+/* Estilo para cada evento */
+.event-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 10px;
+  padding: 20px;
+  flex-basis: calc(30% - 40px); /* Tres columnas */
+  transition: transform 0.3s, box-shadow 0.3s; /* Transiciones suaves */
+}
+
+.event-card:hover {
+  transform: translateY(-5px); /* Efecto de elevación al pasar el mouse */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra más intensa al hacer hover */
+}
+
+/* Estilo para el título del evento */
+.event-card h3 {
+  color: #007bff; /* Color azul para el título */
+  margin-bottom: 10px;
+}
+
+/* Estilo para la descripción del evento */
+.event-card p {
+  color: #555;
+  margin-bottom: 15px;
+}
+
+/* Estilo para el botón de más información */
+.event-button {
+  background-color: #007bff; /* Color de fondo */
+  color: white; /* Color del texto */
+  padding: 10px 15px; /* Espaciado interno */
+  border: none; /* Sin borde */
+  border-radius: 5px; /* Bordes redondeados */
+  cursor: pointer; /* Cambia el cursor al pasar el mouse */
+  transition: background-color 0.3s; /* Transiciones suaves */
+}
+
+.event-button:hover {
+  background-color: darkblue; /* Cambio de color al pasar el mouse */
+}
+
+/* Estilo para el diálogo */
+.dialog-title {
+  font-weight: bold; /* Negrita para el título del diálogo */
+}
+
+.dialog-content {
+  padding: 20px; /* Espaciado interno */
 }
 
 /* Estilo para el contenedor del botón */

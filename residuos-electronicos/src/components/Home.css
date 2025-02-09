@@ -1,68 +1,70 @@
-/* Home.css */
-
-/* Estilo para el encabezado */
-h3 {
+/* Estilos generales */
+body {
+  background-color: #f4f4f4;
   font-family: 'Roboto', sans-serif;
-  color: #333;
-  text-align: center;
-  margin-bottom: 30px;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
 }
 
-/* Estilo para el contenedor */
 .MuiContainer-root {
-  padding: 20px;
+  padding: 40px;
+  background: linear-gradient(135deg, #ffffff, #e0e0e0); /* Fondo degradado */
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
+  margin: 40px auto;
+  max-width: 1200px;
 }
 
-/* Asegura que las tarjetas tengan la misma altura y se alineen correctamente */
-.MuiGrid-item {
+.text-image-container {
   display: flex;
-  align-items: stretch;
+  align-items: center; /* Alinea verticalmente el texto y la imagen */
+  gap: 30px; /* Espacio entre el texto y la imagen */
 }
 
-.MuiCard-root {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  flex-grow: 1; /* Asegura que todas las tarjetas crezcan uniformemente */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
-  border-radius: 10px; /* Bordes redondeados */
-  overflow: hidden; /* Asegura que el contenido no se salga de los bordes */
-}
-
-.MuiCard-root:hover {
-  transform: scale(1.05);
-}
-
-/* Estilo para el contenido de las tarjetas */
-.MuiCardContent-root {
-  padding: 20px;
-  text-align: center; /* Centrar el texto */
-}
-
-/* Estilo para los títulos de las tarjetas */
-.MuiTypography-h5 {
-  font-weight: bold;
-  color: #1976d2;
-  margin-bottom: 10px;
-}
-
-/* Estilo para el texto de las tarjetas */
-.MuiTypography-body2 {
+.text-content {
+  flex: 1; /* El texto ocupa exactamente la mitad */
   color: #555;
-  margin-bottom: 20px;
-  flex-grow: 1; /* Asegura que el contenido del texto ocupe espacio disponible */
+  line-height: 1.6;
+  padding-right: 20px; /* Añade un poco de espacio entre el texto y la imagen */
 }
 
-/* Estilo para los botones */
-.MuiButton-contained {
-  background-color: #1976d2;
-  color: white;
-  font-weight: bold;
-  padding: 10px 20px;
-  margin-top: auto; /* Empuja el botón al final del contenedor */
+.image-content {
+  flex: 1; /* La imagen ocupa exactamente la mitad */
+  text-align: center; /* Centra la imagen horizontalmente */
 }
 
-.MuiButton-contained:hover {
-  background-color: #1565c0;
+.image-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Estilo del botón */
+button {
+  transition: background-color 0.3s, transform 0.3s; /* Transiciones suaves */
+}
+
+button:hover {
+  transform: scale(1.05); /* Efecto de aumento al pasar el mouse */
+}
+
+/* Efecto de sombra en la imagen */
+.image-content img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Sombra al pasar el mouse */
+}
+
+/* Media queries para diseño responsivo */
+@media (max-width: 768px) {
+  .text-image-container {
+      flex-direction: column; /* Apila el texto sobre la imagen en pantallas pequeñas */
+      text-align: center;
+  }
+
+  .text-content {
+      margin-bottom: 20px;
+      padding-right: 0; /* Elimina el padding en pantallas pequeñas */
+  }
 }

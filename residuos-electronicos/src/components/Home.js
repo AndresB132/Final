@@ -1,134 +1,61 @@
 // src/components/Home.js
 import React from 'react';
-import { Container, Typography, Grid, Card, CardContent, Button } from '@mui/material';
+import { Container, Typography, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
-import "./Home.css"
+import './Home.css';
 
 const Home = () => {
-  return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Typography variant="h3" align="center" gutterBottom>
-        Gestión de Residuos Electrónicos
-      </Typography>
+    return (
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
+            {/* Contenedor principal con texto e imagen */}
+            <div className="text-image-container">
+                {/* Contenido de texto */}
+                <div className="text-content">
+                    <Typography variant="h3" gutterBottom>
+                    Reciclar para un futuro mejor
+                    </Typography>
 
-      <Grid container spacing={4}>
-        {/* Botón para Usuarios */}
-        <Grid item xs={12} sm={6} md={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h5" component="div">
-                Usuarios
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Gestionar personas que entregan residuos electrónicos.
-              </Typography>
-              <Button
-                component={Link}
-                to="/usuarios"
-                variant="contained"
-                fullWidth
-                sx={{ mt: 2 }}
-              >
-                Ir a Usuarios
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
+                    <Typography variant="h5" sx={{ mt: 2 }}>
+                        ¡Reciclar es responsabilidad de todos!
+                    </Typography>
 
-        {/* Botón para Dispositivos */}
-        <Grid item xs={12} sm={6} md={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h5" component="div">
-                Dispositivos
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Registrar y gestionar dispositivos recogidos.
-              </Typography>
-              <Button
-                component={Link}
-                to="/dispositivos"
-                variant="contained"
-                fullWidth
-                sx={{ mt: 2 }}
-              >
-                Ir a Dispositivos
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
+                    <Typography variant="body1" sx={{ mt: 1, mb: 4 }}>
+                    Cada día generamos una gran cantidad de residuos,
+                     y es fundamental tomar conciencia sobre la importancia del reciclaje para proteger nuestro medio ambiente y reducir la contaminación.
+                    </Typography>
 
-        {/* Botón para Ubicaciones */}
-        <Grid item xs={12} sm={6} md={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h5" component="div">
-                Ubicaciones
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Ver y agregar puntos de recolección generales.
-              </Typography>
-              <Button
-                component={Link}
-                to="/ubicaciones"
-                variant="contained"
-                fullWidth
-                sx={{ mt: 2 }}
-              >
-                Ir a Ubicaciones
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
+                    <Typography variant="body1" sx={{ mb: 4 }}>
+                        Al reciclar, no solo ayudamos a conservar recursos naturales, sino que también evitamos que
+                        materiales peligrosos lleguen a nuestros vertederos. ¡Hagamos nuestra parte!
+                    </Typography>
 
-        {/* Botón para Puntos de Recolección */}
-        <Grid item xs={12} sm={6} md={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h5" component="div">
-                Puntos de Recolección
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Ver y agregar puntos específicos de recolección.
-              </Typography>
-              <Button
-                component={Link}
-                to="/puntos-recoleccion"
-                variant="contained"
-                fullWidth
-                sx={{ mt: 2 }}
-              >
-                Ir a Puntos de Recolección
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
+                    {/* Botón de llamada a la acción */}
+                    <Button
+                        variant="contained"
+                        component={Link}
+                        to="/puntos-recoleccion"
+                        sx={{
+                            backgroundColor: '#1976d2',
+                            '&:hover': {
+                                backgroundColor: '#1565c0',
+                            },
+                        }}
+                    >
+                        Comienza a Reciclar
+                    </Button>
+                </div>
 
-        {/* Botón para Eventos */}
-        <Grid item xs={12} sm={6} md={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h5" component="div">
-                Eventos
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Registrar y gestionar eventos relacionados con la recolección.
-              </Typography>
-              <Button
-                component={Link}
-                to="/eventos"
-                variant="contained"
-                fullWidth
-                sx={{ mt: 2 }}
-              >
-                Ir a Eventos
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-    </Container>
-  );
+                {/* Contenido de imagen */}
+                <div className="image-content">
+                    <img
+                        src="https://www.pactoglobal-colombia.org/images/jch-optimize/ng/images_NoticiasHome_2023_PORTS__e5e35.webp"
+                        alt="Reciclaje"
+                        style={{ display: 'block', maxWidth: '100%', height: '100%' }}
+                    />
+                </div>
+            </div>
+        </Container>
+    );
 };
 
-export default Home;
+export default Home;  
