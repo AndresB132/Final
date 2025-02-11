@@ -7,26 +7,30 @@ require('dotenv').config();
 // Importar rutas
 const usuarioRoutes = require('./routes/usuarioRoutes');
 const ubicacionRoutes = require('./routes/ubicacionRoutes');
-const dispositivoRoutes = require('./routes/dispositivoRoutes');
+const materialRoutes = require('./routes/materialRoutes');  // Cambio de "dispositivoRoutes" a "materialRoutes"
 const eventoRoutes = require('./routes/eventoRoutes');
 const puntosRecoleccionRoutes = require('./routes/puntosRecoleccionRoutes');
 
+// Crear una instancia de express
 const app = express();
+
+// Obtener el puerto desde la variable de entorno o por defecto 5000
 const port = process.env.PORT || 5000;
 
 // Middleware de seguridad y CORS
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: 'http://localhost:3000',  // Ajusta la URL de tu frontend si es necesario
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-app.use(helmet());
-app.use(express.json());
+
+app.use(helmet());  // Protección contra vulnerabilidades comunes
+app.use(express.json());  // Middleware para analizar cuerpos de solicitudes JSON
 
 // Usar las rutas
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/ubicaciones', ubicacionRoutes);
-app.use('/api/dispositivos', dispositivoRoutes);
+app.use('/api/materiales', materialRoutes);  // Ruta cambiada a /api/materiales
 app.use('/api/eventos', eventoRoutes);
 app.use('/api/puntos-recoleccion', puntosRecoleccionRoutes);
 
